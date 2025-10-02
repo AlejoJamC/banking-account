@@ -95,6 +95,7 @@ public class Account {
 
     private void validateSufficientFunds(BigDecimal amount) {
         if (balance.compareTo(amount) < 0) {
+            // create custom exception InsufficientFundsException
             throw new IllegalArgumentException("Insufficient funds");
         }
     }
