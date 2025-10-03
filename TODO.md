@@ -13,9 +13,9 @@ Implemented relationship and code structure to support this, pending unit tests
 
 [WIP] Creating profiles to handle seeds and tests
 
-* One rest endpoint to see current available balance in all accounts
+* One rest endpoint to see current available balance in all accounts 
 
-[DONE] Implemented, pending review and unit tests
+[DONE] Implemented endpoint and unit tests
 
 * One rest endpoint to withdraw money
 * One rest endpoint to transfer money
