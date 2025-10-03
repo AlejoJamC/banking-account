@@ -19,7 +19,7 @@ Write some code in Java to simulate a simple bank account. It should be possible
 
 ## Solution:
 ## Technology Stack:
-* Java 11
+* Java 21
 * Spring Boot
 * Maven
 * Docker

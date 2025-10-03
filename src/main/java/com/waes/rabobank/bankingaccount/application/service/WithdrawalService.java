@@ -2,11 +2,17 @@ package com.waes.rabobank.bankingaccount.application.service;
 
 import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequest;
 import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponse;
+import com.waes.rabobank.bankingaccount.domain.enums.CardStatus;
+import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
+import com.waes.rabobank.bankingaccount.domain.model.Transaction;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.CardRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class WithdrawalService {
@@ -22,12 +28,14 @@ public class WithdrawalService {
     }
 
     @Transactional
-    public WithdrawalResponse withdraw (WithdrawalRequest request) {
+    public WithdrawalResponse withdraw(WithdrawalRequest request) {
         // Fetch account by ID
-        var account = accountRepository.findById(request.accountId()).orElseThrow(() -> new RuntimeException("Account not found"));
+        UUID accountId = UUID.fromString(request.accountId());
+        UUID cardId = UUID.fromString(request.cardId());
+        var account = accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
 
         // Validate card
-        var card = cardRepository.findById(request.cardId()).orElseThrow(() -> new RuntimeException("Card not found"));
+        var card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found"));
         if (!card.getAccount().getId().equals(account.getId())) {
             throw new RuntimeException("Card does not belong to the account");
         }
@@ -45,12 +53,18 @@ public class WithdrawalService {
         accountRepository.save(account);
 
         // Record transaction
-        var transaction = new Transaction();
-        transaction.setAccount(account);
-        transaction.setAmount(request.amount());
-        transaction.setType(TransactionType.WITHDRAWAL);
+        var transaction = new Transaction(
+                account,
+                card,
+                TransactionType.WITHDRAWAL,
+                request.amount(),
+                BigDecimal.ZERO, // No fee for simplicity
+                account.getBalance()
+        );
         transactionRepository.save(transaction);
 
-        return new WithDrawalResponse(account.getId(), account.getBalance());
+        return new WithdrawalResponse(account.getId().toString(),
+                account.getBalance(),
+                account.getCard().getId().toString());
     }
 }

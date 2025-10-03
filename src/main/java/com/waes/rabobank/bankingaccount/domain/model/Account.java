@@ -156,4 +156,8 @@ public class Account {
     public void setStatus(AccountStatus status) {
         this.status = status;
     }
+
+    public void setBalance(BigDecimal difference) {
+        this.balance = difference;
+    }
 }

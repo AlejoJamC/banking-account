@@ -172,4 +172,8 @@ public class Transaction {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
 }
