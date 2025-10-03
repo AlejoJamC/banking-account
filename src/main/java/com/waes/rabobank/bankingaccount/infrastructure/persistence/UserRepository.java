@@ -1,22 +1,19 @@
 package com.waes.rabobank.bankingaccount.infrastructure.persistence;
 
 import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
-import com.waes.rabobank.bankingaccount.domain.model.Account;
 import com.waes.rabobank.bankingaccount.domain.model.Transaction;
 import com.waes.rabobank.bankingaccount.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-
-    List<Transaction> findByAccountIdOrderByCreatedAtDesc(UUID accountId);
 
     @Query("""
             SELECT t 
@@ -42,4 +39,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             @Param("accountId") UUID accountId,
             @Param("type") TransactionType type,
             @Param("since") Instant since);
+
+    Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 }

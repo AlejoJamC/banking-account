@@ -2,16 +2,12 @@ package com.waes.rabobank.bankingaccount.domain.model;
 
 import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
-
-import static org.hibernate.type.SqlTypes.VARCHAR;
-
 
 @Entity
 @Table(name = "transactions", indexes = {
@@ -22,7 +18,6 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(VARCHAR)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

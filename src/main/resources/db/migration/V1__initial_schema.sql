@@ -1,6 +1,6 @@
 CREATE TABLE accounts
 (
-    id             VARCHAR                     NOT NULL,
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id        UUID                        NOT NULL,
     account_number VARCHAR(34)                 NOT NULL,
     balance        NUMERIC(19, 4)              NOT NULL DEFAULT 0 CHECK (balance >= 0),
@@ -8,27 +8,25 @@ CREATE TABLE accounts
     status         VARCHAR(20)                 NOT NULL,
     version        BIGINT,
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT pk_accounts PRIMARY KEY (id)
+    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE cards
 (
-    id            UUID                        NOT NULL,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     card_type     VARCHAR(31)                 NOT NULL,
     account_id    UUID                        NOT NULL,
     card_number   VARCHAR(16)                 NOT NULL,
-    expiry_date   date                        NOT NULL,
+    expiry_date   DATE                        NOT NULL,
     ccv_encrypted VARCHAR(100)                NOT NULL,
     status        VARCHAR(20)                 NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT pk_cards PRIMARY KEY (id)
+    updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE transactions
 (
-    id                     VARCHAR                     NOT NULL,
+    id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id             UUID                        NOT NULL,
     card_id                UUID                        NOT NULL,
     transaction_type       VARCHAR(20)                 NOT NULL,
@@ -38,8 +36,7 @@ CREATE TABLE transactions
     related_transaction_id UUID,
     balance_after          DECIMAL(19, 4)              NOT NULL,
     description            VARCHAR(255),
-    created_at             TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT pk_transactions PRIMARY KEY (id)
+    created_at             TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE users

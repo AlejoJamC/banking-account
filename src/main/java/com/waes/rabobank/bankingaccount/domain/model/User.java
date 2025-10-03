@@ -32,7 +32,7 @@ public class User {
     private String bsnId; // Dutch BSN (citizen service number, BurgerServiceNummer)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Account> accounts = new ArrayList<>();
+    private final List<Account> accounts = new ArrayList<>();
 
     @CreatedDate // Review spring Data 3.x enhanced auditing
     @Column(updatable = false, nullable = false)

@@ -2,7 +2,6 @@ package com.waes.rabobank.bankingaccount.domain.model;
 
 import com.waes.rabobank.bankingaccount.domain.enums.AccountStatus;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OptimisticLockType;
 import org.hibernate.annotations.OptimisticLocking;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,8 +12,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-import static java.sql.Types.VARCHAR;
-
 @Entity
 @Table(name = "accounts")
 @EntityListeners(AuditingEntityListener.class)
@@ -23,8 +20,6 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(VARCHAR) // H ibernate 6: Review explicit type mapping to SQL
-    // Validate trade-off of store as Binary(16) vs Char(36)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

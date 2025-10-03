@@ -8,9 +8,10 @@ import java.time.YearMonth;
 
 @Entity
 @DiscriminatorValue("DEBIT") // review discriminator in single table inheritance
-public final class DebitCard extends Card {
+public class DebitCard extends Card {
 
-    protected DebitCard() {}
+    protected DebitCard() {
+    }
 
     public DebitCard(Account account, String cardNumber, YearMonth expiryDate) {
         super(account, cardNumber, expiryDate);

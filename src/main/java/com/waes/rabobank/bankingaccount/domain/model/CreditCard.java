@@ -9,7 +9,7 @@ import java.time.YearMonth;
 
 @Entity
 @DiscriminatorValue("CREDIT")
-public final class CreditCard extends Card {
+public class CreditCard extends Card {
 
     private static final BigDecimal FEE_PERCENTAGE = new BigDecimal("0.01"); // 1% fee, review location and a transform it to dynamic value
 

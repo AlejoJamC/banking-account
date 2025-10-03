@@ -1,6 +1,7 @@
 package com.waes.rabobank.bankingaccount.domain.model;
 
 import com.waes.rabobank.bankingaccount.domain.enums.CardStatus;
+import com.waes.rabobank.bankingaccount.infrastructure.persistence.converter.YearMonthConverter;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // review single table and discriminator column
 @DiscriminatorColumn(name = "card_type", discriminatorType = DiscriminatorType.STRING)
 @EntityListeners(AuditingEntityListener.class)
-public sealed abstract class Card permits DebitCard, CreditCard { // review java 21 sealed classes
+public abstract class Card { // review possible ussage of java 21 sealed classes
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,7 +30,8 @@ public sealed abstract class Card permits DebitCard, CreditCard { // review java
     @Column(name = "card_number", nullable = false, unique = true, length = 16)
     private String cardNumber;
 
-    @Column(name = "expiry_date", nullable = false, length = 5)
+    @Convert(converter = YearMonthConverter.class)
+    @Column(name = "expiry_date", nullable = false)
     private YearMonth expiryDate; // MM/YY format
 
     @Column(name = "ccv_encrypted", nullable = false, length = 100)
