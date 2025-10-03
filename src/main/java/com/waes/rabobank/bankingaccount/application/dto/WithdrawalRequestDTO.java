@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record WithdrawalRequest(
+public record WithdrawalRequestDTO(
         @NotBlank(message = "Account ID is required") String accountId,
 
         @NotNull(message = "Amount is required")

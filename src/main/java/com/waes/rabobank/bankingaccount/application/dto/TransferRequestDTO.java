@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record TransferRequest(
+public record TransferRequestDTO(
         @NotBlank(message = "Source account ID is required")
         String fromAccountId,
 

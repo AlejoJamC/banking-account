@@ -1,8 +1,11 @@
 package com.waes.rabobank.bankingaccount.application.dto;
 
-public record AccountResponse(
+import java.math.BigDecimal;
+
+public record AccountResponseDTO(
+        String accountId,
         String accountNumber,
-        Double balance,
+        BigDecimal balance,
         String currency,
         String accountName,
         String accountType,

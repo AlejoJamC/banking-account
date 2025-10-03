@@ -1,7 +1,7 @@
 package com.waes.rabobank.bankingaccount.application.service;
 
-import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequest;
-import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponse;
+import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequestDTO;
+import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponseDTO;
 import com.waes.rabobank.bankingaccount.domain.enums.CardStatus;
 import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
 import com.waes.rabobank.bankingaccount.domain.model.Transaction;
@@ -28,7 +28,7 @@ public class WithdrawalService {
     }
 
     @Transactional
-    public WithdrawalResponse withdraw(WithdrawalRequest request) {
+    public WithdrawalResponseDTO withdraw(WithdrawalRequestDTO request) {
         // Fetch account by ID
         UUID accountId = UUID.fromString(request.accountId());
         UUID cardId = UUID.fromString(request.cardId());
@@ -63,7 +63,7 @@ public class WithdrawalService {
         );
         transactionRepository.save(transaction);
 
-        return new WithdrawalResponse(account.getId().toString(),
+        return new WithdrawalResponseDTO(account.getId().toString(),
                 account.getBalance(),
                 account.getCard().getId().toString());
     }

@@ -30,11 +30,11 @@ CREATE TABLE transactions
     account_id             UUID                        NOT NULL,
     card_id                UUID                        NOT NULL,
     transaction_type       VARCHAR(20)                 NOT NULL,
-    amount                 DECIMAL(19, 4)              NOT NULL,
-    fee                    DECIMAL(19, 4)              NOT NULL,
+    amount                 NUMERIC(19, 4)              NOT NULL,
+    fee                    NUMERIC(19, 4)              NOT NULL,
     related_account_id     UUID,
     related_transaction_id UUID,
-    balance_after          DECIMAL(19, 4)              NOT NULL,
+    balance_after          NUMERIC(19, 4)              NOT NULL,
     description            VARCHAR(255),
     created_at             TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
