@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 
 /**
@@ -62,16 +63,18 @@ public class LocalDataLoader implements CommandLineRunner {
         // Add accounts and cards for Alejandro
         // Create first account
         Account alejandroAccount1 = new Account(alejandro, "NL01RABO0123456789");
+        alejandroAccount1.deposit(new BigDecimal("5000.00"));
         accountRepository.save(alejandroAccount1);
         // Create debit card for first account
-        DebitCard alejandroCard1 = new DebitCard(alejandroAccount1, "1234-5678-9012-1111", YearMonth.of(2027, 3));
+        DebitCard alejandroCard1 = new DebitCard(alejandroAccount1, "1234567890121111", YearMonth.of(2027, 3));
         cardRepository.save(alejandroCard1);
         // Join card to account, bidirectional relationship
         alejandroAccount1.setCard(alejandroCard1);
         // Create second account, Credit Card
         Account alejandroAccount2 = new Account(alejandro, "NL01RABO1122334455");
+        alejandroAccount2.deposit(new BigDecimal("5000.00"));
         accountRepository.save(alejandroAccount2);
-        CreditCard alejandroCard2 = new CreditCard(alejandroAccount2, "4321-8765-2109-1112", YearMonth.of(2029, 9));
+        CreditCard alejandroCard2 = new CreditCard(alejandroAccount2, "4321876521091112", YearMonth.of(2029, 9));
         cardRepository.save(alejandroCard2);
         alejandroAccount2.setCard(alejandroCard2);
 
@@ -83,8 +86,9 @@ public class LocalDataLoader implements CommandLineRunner {
         );
         userRepository.save(john);
         Account johnAccount1 = new Account(john, "NL02RABO9876543210");
+        johnAccount1.deposit(new BigDecimal("500.00"));
         accountRepository.save(johnAccount1);
-        DebitCard johnCard1 = new DebitCard(johnAccount1, "6543-0000-0000-2222", YearMonth.of(2026, 12));
+        DebitCard johnCard1 = new DebitCard(johnAccount1, "6543000000002222", YearMonth.of(2026, 12));
         cardRepository.save(johnCard1);
         johnAccount1.setCard(johnCard1);
 
@@ -96,8 +100,9 @@ public class LocalDataLoader implements CommandLineRunner {
         );
         userRepository.save(jane);
         Account janeAccount1 = new Account(jane, "NL03RABO5556667778");
+        janeAccount1.deposit(new BigDecimal("2500.00"));
         accountRepository.save(janeAccount1);
-        CreditCard janeCard1 = new CreditCard(janeAccount1, "7777-0000-0000-3333", YearMonth.of(2028, 6));
+        CreditCard janeCard1 = new CreditCard(janeAccount1, "7777000000003333", YearMonth.of(2028, 6));
         cardRepository.save(janeCard1);
         janeAccount1.setCard(janeCard1);
     }

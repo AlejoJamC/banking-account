@@ -18,7 +18,6 @@ CREATE TABLE cards
     account_id    UUID                        NOT NULL,
     card_number   VARCHAR(16)                 NOT NULL,
     expiry_date   DATE                        NOT NULL,
-    ccv_encrypted VARCHAR(100)                NOT NULL,
     status        VARCHAR(20)                 NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL
@@ -67,10 +66,12 @@ ALTER TABLE users
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
+-- Indexes
 CREATE INDEX idx_account_created ON transactions (account_id, created_at);
 CREATE INDEX idx_user_email ON users (email);
 CREATE INDEX idx_user_bsn ON users (bsn_id) WHERE bsn_id IS NOT NULL;
 
+-- Foreign Keys
 ALTER TABLE accounts
     ADD CONSTRAINT FK_ACCOUNTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 

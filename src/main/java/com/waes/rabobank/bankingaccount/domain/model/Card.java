@@ -34,8 +34,7 @@ public abstract class Card { // review possible ussage of java 21 sealed classes
     @Column(name = "expiry_date", nullable = false)
     private YearMonth expiryDate; // MM/YY format
 
-    @Column(name = "ccv_encrypted", nullable = false, length = 100)
-    private String ccvEncrypted; // Review encryption at rest
+    // PCI-DSS Requirement 3.2 - prohibit storing CVV in any retrievable format
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -84,10 +83,6 @@ public abstract class Card { // review possible ussage of java 21 sealed classes
 
     public YearMonth getExpiryDate() {
         return expiryDate;
-    }
-
-    public String getCcvEncrypted() {
-        return ccvEncrypted;
     }
 
     public CardStatus getStatus() {

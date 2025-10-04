@@ -24,9 +24,10 @@ Write some code in Java to simulate a simple bank account. It should be possible
 * Maven
 * Docker
 * PostgreSQL
-* H2 Database
-* LocalStack (AWS Emulation)
 * Junit 5 & testcontainers
+
+### Nice to have:
+* LocalStack (AWS Emulation)
 * OpenTelemetry
 
 ## Design Patterns Used:
@@ -38,11 +39,8 @@ Write some code in Java to simulate a simple bank account. It should be possible
 4. Run `docker-compose up --build` to start the application and PostgreSQL database
 5. The application will be accessible at `http://localhost:8080`
 6. Use Postman or any API client to interact with the REST endpoints
-7. To run tests, execute `mvn test` in the project directory
-8. Access H2 console at `http://localhost:8080/h2-console` with JDBC URL `jdbc:h2:mem:testdb`, username `sa`, and password `password`
-10. Access OpenTelemetry Collector at `http://localhost:4317` for tracing information
-11. Access LocalStack at `http://localhost:4566` for AWS services emulation
-12. Access PostgreSQL database at `localhost:5432` with username `myuser` and password `mypassword`
+7. To run tests, execute `mvn test` in the project directory 
+8. Access PostgreSQL database at `localhost:5432` with username `myuser` and password `mypassword`
 
 ## REST Endpoints:
 * `GET /api/accounts` - Get all accounts with current balance
