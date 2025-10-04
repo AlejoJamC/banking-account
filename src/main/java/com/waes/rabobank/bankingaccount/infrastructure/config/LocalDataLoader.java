@@ -1,6 +1,7 @@
 package com.waes.rabobank.bankingaccount.infrastructure.config;
 
 import com.waes.rabobank.bankingaccount.domain.model.Account;
+import com.waes.rabobank.bankingaccount.domain.model.CreditCard;
 import com.waes.rabobank.bankingaccount.domain.model.DebitCard;
 import com.waes.rabobank.bankingaccount.domain.model.User;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
@@ -63,9 +64,41 @@ public class LocalDataLoader implements CommandLineRunner {
         Account alejandroAccount1 = new Account(alejandro, "NL01RABO0123456789");
         accountRepository.save(alejandroAccount1);
         // Create debit card for first account
-        DebitCard alejandroCard1 = new DebitCard(alejandroAccount1, "1234-5678-9012-3456", YearMonth.of(2027, 3));
+        DebitCard alejandroCard1 = new DebitCard(alejandroAccount1, "1234-5678-9012-1111", YearMonth.of(2027, 3));
         cardRepository.save(alejandroCard1);
         // Join card to account, bidirectional relationship
         alejandroAccount1.setCard(alejandroCard1);
+        // Create second account, Credit Card
+        Account alejandroAccount2 = new Account(alejandro, "NL01RABO1122334455");
+        accountRepository.save(alejandroAccount2);
+        CreditCard alejandroCard2 = new CreditCard(alejandroAccount2, "4321-8765-2109-1112", YearMonth.of(2029, 9));
+        cardRepository.save(alejandroCard2);
+        alejandroAccount2.setCard(alejandroCard2);
+
+        // User 2: John Debit Doe
+        User john = new User(
+                "john@rabobank.nl",
+                "John Debit Doe",
+                "987654321"
+        );
+        userRepository.save(john);
+        Account johnAccount1 = new Account(john, "NL02RABO9876543210");
+        accountRepository.save(johnAccount1);
+        DebitCard johnCard1 = new DebitCard(johnAccount1, "6543-0000-0000-2222", YearMonth.of(2026, 12));
+        cardRepository.save(johnCard1);
+        johnAccount1.setCard(johnCard1);
+
+        // User 3: Jane Credit Smith
+        User jane = new User(
+                "jane@rabobank.nl",
+                "Jane Credit Smith",
+                "555666777"
+        );
+        userRepository.save(jane);
+        Account janeAccount1 = new Account(jane, "NL03RABO5556667778");
+        accountRepository.save(janeAccount1);
+        CreditCard janeCard1 = new CreditCard(janeAccount1, "7777-0000-0000-3333", YearMonth.of(2028, 6));
+        cardRepository.save(janeCard1);
+        janeAccount1.setCard(janeCard1);
     }
 }
