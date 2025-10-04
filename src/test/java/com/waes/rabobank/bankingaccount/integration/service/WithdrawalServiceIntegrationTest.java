@@ -1,21 +1,30 @@
 package com.waes.rabobank.bankingaccount.integration.service;
 
 import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequestDTO;
+import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponseDTO;
 import com.waes.rabobank.bankingaccount.application.service.WithdrawalService;
+import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
+import com.waes.rabobank.bankingaccount.domain.model.Transaction;
+import com.waes.rabobank.bankingaccount.infrastructure.persistence.TransactionRepository;
 import com.waes.rabobank.bankingaccount.support.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private WithdrawalService withdrawalService;
 
-    @Test // testing happy path
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Test
+        // testing happy path
     void shouldWithdrawSuccessfully() {
         // Arrange
         WithdrawalRequestDTO request = new WithdrawalRequestDTO(
@@ -51,4 +60,44 @@ public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
             assertThat(ex.getMessage()).isEqualTo("Insufficient balance");
         }
     }
+
+    @Test
+    void shouldWithdrawWithDebitCard() {
+        // Arrange
+        WithdrawalRequestDTO request = new WithdrawalRequestDTO(
+                testAccount.getId().toString(),
+                new BigDecimal("100.00"),
+                testDebitCard.getId().toString()
+        );
+
+        // Act
+        WithdrawalResponseDTO response = withdrawalService.withdraw(request);
+
+        // Assert
+        assertThat(response.newBalance()).isEqualByComparingTo("900.00");
+        assertThat(response.fee()).isEqualByComparingTo("0.00");
+
+        // Verify Transaction created
+        List<Transaction> transactions = transactionRepository.findByAccountId(testAccount.getId());
+        assertThat(transactions).hasSize(1);
+        assertThat(transactions.get(0).getType()).isEqualTo(TransactionType.WITHDRAWAL);
+    }
+
+    @Test
+    void shouldWithdrawWithCreditCardAndApplyFee() {
+        // Arrange
+        WithdrawalRequestDTO request = new WithdrawalRequestDTO(
+                testCreditCard.getAccount().getId().toString(), // Use credit account
+                new BigDecimal("100.00"),
+                testCreditCard.getId().toString() // Use credit card
+        );
+
+        // Act
+        WithdrawalResponseDTO response = withdrawalService.withdraw(request);
+
+        // Assert
+        assertThat(response.fee()).isEqualByComparingTo("1.00");  // 1% fee
+        assertThat(response.newBalance()).isEqualByComparingTo("1899.00");  // 2000 - 100 - 1
+    }
+
 }
