@@ -17,7 +17,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // review single table and discriminator column
 @DiscriminatorColumn(name = "card_type", discriminatorType = DiscriminatorType.STRING)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Card { // review possible ussage of java 21 sealed classes
+public abstract class Card { // review possible usage of java 21 sealed classes
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -57,7 +57,12 @@ public abstract class Card { // review possible ussage of java 21 sealed classes
         this.expiryDate = expiryDate;
     }
 
-    // Review business logic in entity
+    /**
+     * Calculate withdrawal fee based on card type - polymorphic method
+     *
+     * @param amount Transaction amount
+     * @return Fee to be charged (0 for debit, 1% for credit)
+     */
     public abstract BigDecimal calculateFee(BigDecimal amount);
 
     public boolean isExpired() {

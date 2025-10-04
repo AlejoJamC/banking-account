@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 
 public record WithdrawalResponseDTO(
         String accountId,
-        BigDecimal newBalance,
-        String cardId
+        String cardId,
+        BigDecimal amount,
+        BigDecimal fee,
+        BigDecimal newBalance
 ) {
 }

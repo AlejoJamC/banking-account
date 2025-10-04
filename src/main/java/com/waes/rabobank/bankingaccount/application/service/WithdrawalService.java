@@ -48,15 +48,17 @@ public class WithdrawalService {
             throw new RuntimeException("Card is not active"); // create InactiveCardException
         }
 
+        // Calculate fee (polymorphism in action)
+        BigDecimal fee = card.calculateFee(request.amount());
+        BigDecimal totalAmount = request.amount().add(fee);
+
         // Validate sufficient balance
-        if (account.getBalance().compareTo(request.amount()) < 0) {
+        if (account.getBalance().compareTo(totalAmount) < 0) {
             throw new RuntimeException("Insufficient balance");
         }
 
-        // TODO: pending review fee logic
-
         // Deduct amount from account balance
-        account.withdraw(request.amount());
+        account.withdraw(totalAmount);
         accountRepository.save(account);
 
         // Record transaction
@@ -65,15 +67,18 @@ public class WithdrawalService {
                 card,
                 TransactionType.WITHDRAWAL,
                 request.amount(),
-                BigDecimal.ZERO, // No fee for simplicity, review TODO above
+                fee,
                 account.getBalance()
         );
         transactionRepository.save(transaction);
 
         return new WithdrawalResponseDTO(
+                // TODO: validate usage of transactionId as public part of the response
                 account.getId().toString(),
-                account.getBalance(),
-                account.getCard().getId().toString()
+                account.getCard().getId().toString(),
+                request.amount(),
+                fee,
+                account.getBalance()
         );
     }
 }

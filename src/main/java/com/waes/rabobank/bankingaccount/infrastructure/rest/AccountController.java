@@ -56,9 +56,12 @@ public class AccountController {
         return 600489147L;
     }
 
-    // validate location and architecture
+    // ============================
+    // Withdraw section
+    // ============================
     @PostMapping("/{accountId}/withdraw")
     public ResponseEntity<WithdrawalResponseDTO> withdraw(
+            @RequestHeader("X-User-Id") String authenticatedUserId,
             @PathVariable String accountId,
             @Valid @RequestBody WithdrawalRequestDTO request
     ) {
@@ -72,5 +75,4 @@ public class AccountController {
 
         return ResponseEntity.ok(response);
     }
-
 }
