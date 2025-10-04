@@ -4,6 +4,8 @@ import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequestDTO;
 import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponseDTO;
 import com.waes.rabobank.bankingaccount.domain.enums.CardStatus;
 import com.waes.rabobank.bankingaccount.domain.enums.TransactionType;
+import com.waes.rabobank.bankingaccount.domain.model.Account;
+import com.waes.rabobank.bankingaccount.domain.model.Card;
 import com.waes.rabobank.bankingaccount.domain.model.Transaction;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.CardRepository;
@@ -32,15 +34,18 @@ public class WithdrawalService {
         // Fetch account by ID
         UUID accountId = UUID.fromString(request.accountId());
         UUID cardId = UUID.fromString(request.cardId());
-        var account = accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
 
+        // validate account
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found")); // create AccountNotFoundException
         // Validate card
-        var card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found"));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found")); // create CardNotFoundException
+
+        // Workflow validations
         if (!card.getAccount().getId().equals(account.getId())) {
-            throw new RuntimeException("Card does not belong to the account");
+            throw new RuntimeException("Card does not belong to the account"); // create CardAccountMismatchException
         }
         if (card.getStatus() != CardStatus.ACTIVE) {
-            throw new RuntimeException("Card is not active");
+            throw new RuntimeException("Card is not active"); // create InactiveCardException
         }
 
         // Validate sufficient balance
@@ -48,8 +53,10 @@ public class WithdrawalService {
             throw new RuntimeException("Insufficient balance");
         }
 
+        // TODO: pending review fee logic
+
         // Deduct amount from account balance
-        account.setBalance(account.getBalance().subtract(request.amount()));
+        account.withdraw(request.amount());
         accountRepository.save(account);
 
         // Record transaction
@@ -58,13 +65,15 @@ public class WithdrawalService {
                 card,
                 TransactionType.WITHDRAWAL,
                 request.amount(),
-                BigDecimal.ZERO, // No fee for simplicity
+                BigDecimal.ZERO, // No fee for simplicity, review TODO above
                 account.getBalance()
         );
         transactionRepository.save(transaction);
 
-        return new WithdrawalResponseDTO(account.getId().toString(),
+        return new WithdrawalResponseDTO(
+                account.getId().toString(),
                 account.getBalance(),
-                account.getCard().getId().toString());
+                account.getCard().getId().toString()
+        );
     }
 }

@@ -28,11 +28,11 @@ public class User {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "bsn_id", unique = true)
+    @Column(name = "bsn_id", unique = true, length = 9)
     private String bsnId; // Dutch BSN (citizen service number, BurgerServiceNummer)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Account> accounts = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<>();
 
     @CreatedDate // Review spring Data 3.x enhanced auditing
     @Column(updatable = false, nullable = false)
@@ -47,6 +47,7 @@ public class User {
         // JPA required
     }
 
+    // Business constructor
     public User(String email, String fullName, String bsnId) {
         this.email = email;
         this.fullName = fullName;
@@ -54,10 +55,6 @@ public class User {
     }
 
     // Getters
-    public User(UUID id) {
-        this.id = id;
-    }
-
     public UUID getId() {
         return id;
     }
@@ -72,6 +69,10 @@ public class User {
 
     public String getBsnId() {
         return bsnId;
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
     }
 
     public Instant getCreatedAt() {

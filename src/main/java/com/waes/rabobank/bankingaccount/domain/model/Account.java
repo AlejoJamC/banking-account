@@ -69,8 +69,8 @@ public class Account {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-        if (balance.compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient funds");
+        if (this.balance.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient funds"); // create InsufficientFundsException
         }
         this.balance = this.balance.subtract(amount);
     }
@@ -80,19 +80,6 @@ public class Account {
             throw new IllegalArgumentException("Amount must be positive");
         }
         this.balance = this.balance.add(amount);
-    }
-
-    private void validatePositiveAmount(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-    }
-
-    private void validateSufficientFunds(BigDecimal amount) {
-        if (balance.compareTo(amount) < 0) {
-            // create custom exception InsufficientFundsException
-            throw new IllegalArgumentException("Insufficient funds");
-        }
     }
 
     public boolean hasCard() {
@@ -146,13 +133,12 @@ public class Account {
 
     public void setCard(Card card) {
         this.card = card;
+        if (card != null && card.getAccount() != this) {
+            card.setAccount(this);
+        }
     }
 
     public void setStatus(AccountStatus status) {
         this.status = status;
-    }
-
-    public void setBalance(BigDecimal difference) {
-        this.balance = difference;
     }
 }

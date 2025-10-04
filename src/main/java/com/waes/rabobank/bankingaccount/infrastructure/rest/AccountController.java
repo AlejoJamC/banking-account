@@ -68,8 +68,8 @@ public class AccountController {
         if (!request.accountId().equals(accountId)) {
             throw new IllegalArgumentException("Account ID mismatch");
         }
-
         WithdrawalResponseDTO response = withdrawalService.withdraw(request);
+
         return ResponseEntity.ok(response);
     }
 
