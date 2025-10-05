@@ -1,14 +1,15 @@
 package com.waes.rabobank.bankingaccount.infrastructure.rest;
 
 import com.waes.rabobank.bankingaccount.application.dto.AccountBalanceDTO;
+import com.waes.rabobank.bankingaccount.application.dto.WithdrawalRequestDTO;
+import com.waes.rabobank.bankingaccount.application.dto.WithdrawalResponseDTO;
 import com.waes.rabobank.bankingaccount.application.service.AccountService;
 import com.waes.rabobank.bankingaccount.application.service.WithdrawalService;
-import com.waes.rabobank.bankingaccount.infrastructure.config.JpaAuditingConfiguration;
+import com.waes.rabobank.bankingaccount.shared.exception.InsufficientFundsException;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -16,7 +17,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,7 +36,7 @@ class AccountControllerTest {
     private WithdrawalService withdrawalService;
 
     @Test
-    void getAllAccounts_shouldReturnBalances() throws Exception {
+    void shouldReturnBalancesWhenGettingAllAccounts() throws Exception {
         UUID userId = UUID.randomUUID();
         List<AccountBalanceDTO> balances = List.of(
                 new AccountBalanceDTO(
@@ -51,7 +54,7 @@ class AccountControllerTest {
                         "EUR"
                 )
         );
-        Mockito.when(accountService.getBalancesByUserId(eq(userId))).thenReturn(balances);
+        when(accountService.getBalancesByUserId(eq(userId))).thenReturn(balances);
 
         mockMvc.perform(get("/api/accounts")
                         .header("X-User-Id", userId.toString()))
@@ -63,7 +66,7 @@ class AccountControllerTest {
     }
 
     @Test
-    void getAccount_shouldReturnAccountResponseDTO() throws Exception {
+    void shouldReturnAccountWhenGettingById() throws Exception {
         UUID id = UUID.randomUUID();
         mockMvc.perform(get("/api/accounts/" + id))
                 .andExpect(status().isOk())
@@ -72,48 +75,96 @@ class AccountControllerTest {
     }
 
     @Test
-    void getAccountsCount_shouldReturnCount() throws Exception {
+    void shouldReturnCountWhenGettingAccountsCount() throws Exception {
         mockMvc.perform(get("/api/accounts/count"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("600489147"));
     }
 
-//    @Test
-//    void withdraw_shouldReturnWithdrawalResponseDTO() throws Exception {
-//        String accountId = "acc-123";
-//        WithdrawalRequestDTO request = new WithdrawalRequestDTO(accountId, BigDecimal.valueOf(50));
-//        WithdrawalResponseDTO response = new WithdrawalResponseDTO(accountId, BigDecimal.valueOf(950.0), "SUCCESS");
-//
-//        Mockito.when(withdrawalService.withdraw(any(WithdrawalRequestDTO.class))).thenReturn(response);
-//
-//        String requestBody = """
-//            {
-//                "accountId": "acc-123",
-//                "amount": 50
-//            }
-//            """;
-//
-//        mockMvc.perform(post("/api/accounts/acc-123/withdraw")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestBody))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.accountId").value("acc-123"))
-//                .andExpect(jsonPath("$.balance").value(950.0))
-//                .andExpect(jsonPath("$.status").value("SUCCESS"));
-//    }
-//
-//    @Test
-//    void withdraw_shouldReturnBadRequestForAccountIdMismatch() throws Exception {
-//        String requestBody = """
-//            {
-//                "accountId": "wrong-id",
-//                "amount": 50
-//            }
-//            """;
-//
-//        mockMvc.perform(post("/api/accounts/acc-123/withdraw")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestBody))
-//                .andExpect(status().isBadRequest());
-//    }
+    // === Withdrawal Endpoint Tests ===
+
+    @Test
+    void shouldWithdrawSuccessfully() throws Exception {
+        UUID accountId = UUID.randomUUID();
+        UUID cardId = UUID.randomUUID();
+        UUID transactionId = UUID.randomUUID();
+
+        WithdrawalResponseDTO response = new WithdrawalResponseDTO(
+                transactionId.toString(),
+                accountId.toString(),
+                new BigDecimal("100.00"),
+                new BigDecimal("1.00"),
+                new BigDecimal("899.00")
+        );
+
+        when(withdrawalService.withdraw(any(WithdrawalRequestDTO.class)))
+                .thenReturn(response);
+
+        String requestBody = String.format("""
+            {
+                "accountId": "%s",
+                "amount": 100.00,
+                "cardId": "%s"
+            }
+            """, accountId, cardId);
+
+        mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value(transactionId.toString()))
+                .andExpect(jsonPath("$.accountId").value(accountId.toString()))
+                .andExpect(jsonPath("$.amount").value(100.00))
+                .andExpect(jsonPath("$.fee").value(1.00))
+                .andExpect(jsonPath("$.balanceAfter").value(899.00));
+    }
+
+    @Test
+    void shouldReturn422WhenInsufficientFunds() throws Exception {
+        UUID accountId = UUID.randomUUID();
+        UUID cardId = UUID.randomUUID();
+
+        when(withdrawalService.withdraw(any(WithdrawalRequestDTO.class)))
+                .thenThrow(new InsufficientFundsException(
+                        accountId,
+                        new BigDecimal("50.00"),
+                        new BigDecimal("100.00")
+                ));
+
+        String requestBody = String.format("""
+            {
+                "accountId": "%s",
+                "amount": 100.00,
+                "cardId": "%s"
+            }
+            """, accountId, cardId);
+
+        mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.status").value(422))
+                .andExpect(jsonPath("$.title").value("Insufficient Funds"))
+                .andExpect(jsonPath("$.availableBalance").value(50.00))
+                .andExpect(jsonPath("$.requestedAmount").value(100.00))
+                .andExpect(jsonPath("$.shortfall").value(50.00));
+    }
+
+    @Test
+    void shouldReturn400WhenRequestIsInvalid() throws Exception {
+        UUID accountId = UUID.randomUUID();
+
+        String requestBody = """
+            {
+                "accountId": "",
+                "amount": -10,
+                "cardId": ""
+            }
+            """;
+
+        mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
 }
