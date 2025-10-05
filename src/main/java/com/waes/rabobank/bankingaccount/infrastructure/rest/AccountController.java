@@ -61,7 +61,7 @@ public class AccountController {
     // ============================
     @PostMapping("/{accountId}/withdraw")
     public ResponseEntity<WithdrawalResponseDTO> withdraw(
-            @RequestHeader("X-User-Id") String authenticatedUserId,
+            //@RequestHeader("X-User-Id") String authenticatedUserId, // TODO: review later if needed
             @PathVariable String accountId,
             @Valid @RequestBody WithdrawalRequestDTO request
     ) {

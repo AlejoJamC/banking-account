@@ -82,16 +82,14 @@ class AccountControllerTest {
     }
 
     // === Withdrawal Endpoint Tests ===
-
     @Test
     void shouldWithdrawSuccessfully() throws Exception {
         UUID accountId = UUID.randomUUID();
         UUID cardId = UUID.randomUUID();
-        UUID transactionId = UUID.randomUUID();
 
         WithdrawalResponseDTO response = new WithdrawalResponseDTO(
-                transactionId.toString(),
                 accountId.toString(),
+                cardId.toString(),
                 new BigDecimal("100.00"),
                 new BigDecimal("1.00"),
                 new BigDecimal("899.00")
@@ -101,22 +99,23 @@ class AccountControllerTest {
                 .thenReturn(response);
 
         String requestBody = String.format("""
-            {
-                "accountId": "%s",
-                "amount": 100.00,
-                "cardId": "%s"
-            }
-            """, accountId, cardId);
+        {
+            "accountId": "%s",
+            "amount": 100.00,
+            "cardId": "%s"
+        }
+        """, accountId, cardId);
 
         mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .header("X-User-Id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transactionId").value(transactionId.toString()))
                 .andExpect(jsonPath("$.accountId").value(accountId.toString()))
+                .andExpect(jsonPath("$.cardId").value(cardId.toString()))
                 .andExpect(jsonPath("$.amount").value(100.00))
                 .andExpect(jsonPath("$.fee").value(1.00))
-                .andExpect(jsonPath("$.balanceAfter").value(899.00));
+                .andExpect(jsonPath("$.newBalance").value(899.00));
     }
 
     @Test
@@ -132,14 +131,15 @@ class AccountControllerTest {
                 ));
 
         String requestBody = String.format("""
-            {
-                "accountId": "%s",
-                "amount": 100.00,
-                "cardId": "%s"
-            }
-            """, accountId, cardId);
+        {
+            "accountId": "%s",
+            "amount": 100.00,
+            "cardId": "%s"
+        }
+        """, accountId, cardId);
 
         mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .header("X-User-Id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isUnprocessableEntity())
@@ -155,14 +155,15 @@ class AccountControllerTest {
         UUID accountId = UUID.randomUUID();
 
         String requestBody = """
-            {
-                "accountId": "",
-                "amount": -10,
-                "cardId": ""
-            }
-            """;
+        {
+            "accountId": "",
+            "amount": -10,
+            "cardId": ""
+        }
+        """;
 
         mockMvc.perform(post("/api/accounts/" + accountId + "/withdraw")
+                        .header("X-User-Id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest());

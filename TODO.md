@@ -5,7 +5,7 @@
 * [DONE] Account should contain at least some user details, card details and current balance
 * [DONE] One credit card or debit card is linked with one account
 * [DONE] One rest endpoint to see current available balance in all accounts 
-* One rest endpoint to withdraw money
+* [DONE] One rest endpoint to withdraw money
 * One rest endpoint to transfer money
 * It should be able to audit transfers or withdrawals
 
