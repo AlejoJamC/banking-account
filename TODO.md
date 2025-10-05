@@ -1,10 +1,7 @@
 # Work In Progress
 
 
-* A negative balance is not possible
-
-partially implemented, pending **review not leaking domain logic and unit tests**
-
+* [DONE] A negative balance is not possible
 * [DONE] Account should contain at least some user details, card details and current balance
 * [DONE] One credit card or debit card is linked with one account
 * [DONE] One rest endpoint to see current available balance in all accounts 
