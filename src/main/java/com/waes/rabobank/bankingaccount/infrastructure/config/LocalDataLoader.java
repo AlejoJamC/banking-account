@@ -55,7 +55,7 @@ public class LocalDataLoader implements CommandLineRunner {
     private void createSeedData() {
         // User 1: Alejandro Mantilla
         User alejandro = new User(
-                "alejandro.mantilla@rabobank.nl",
+                "alejandro@rabobank.nl",
                 "Alejandro Mantilla",
                 "123456789"
         );
