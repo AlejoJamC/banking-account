@@ -38,7 +38,7 @@ public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
         var response = withdrawalService.withdraw(request);
 
         // Assert
-        assertThat(response.newBalance()).isEqualByComparingTo(new BigDecimal("900.00"));
+        assertThat(response.balanceAfter()).isEqualByComparingTo(new BigDecimal("900.00"));
 
         // Verify account balance in the database
         var reloadedAccount = accountRepository.findById(testAccount.getId()).orElseThrow();
@@ -73,7 +73,7 @@ public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
         WithdrawalResponseDTO response = withdrawalService.withdraw(request);
 
         // Assert
-        assertThat(response.newBalance()).isEqualByComparingTo("900.00");
+        assertThat(response.balanceAfter()).isEqualByComparingTo("900.00");
         assertThat(response.fee()).isEqualByComparingTo("0.00");
 
         // Verify Transaction created
@@ -96,7 +96,7 @@ public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
 
         // Assert
         assertThat(response.fee()).isEqualByComparingTo("1.00");  // 1% fee
-        assertThat(response.newBalance()).isEqualByComparingTo("1899.00");  // 2000 - 100 - 1
+        assertThat(response.balanceAfter()).isEqualByComparingTo("1899.00");  // 2000 - 100 - 1
     }
 
     @Test

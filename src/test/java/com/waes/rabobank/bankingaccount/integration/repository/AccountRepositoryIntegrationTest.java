@@ -4,11 +4,11 @@ import com.waes.rabobank.bankingaccount.domain.model.Account;
 import com.waes.rabobank.bankingaccount.domain.model.User;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.UserRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 

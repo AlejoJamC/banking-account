@@ -37,7 +37,7 @@ public abstract class BaseIntegrationTest {
 
     static {
         // Enable container reuse (effective only if testcontainers.reuse.enable=true is set
-        // in ~/.testcontainers.properties or src/test/resources/testcontainers.properties)
+        // in src/test/resources/testcontainers.properties
         POSTGRES.withReuse(true);
         // Start once per JVM; keep it outside of JUnit's @Testcontainers lifecycle
         POSTGRES.start();
@@ -54,11 +54,11 @@ public abstract class BaseIntegrationTest {
     protected User testUser;
     protected Account testAccount;
     protected DebitCard testDebitCard;
+    protected Account testCreditCardAccount;
     protected CreditCard testCreditCard;
 
     @BeforeEach
     void setupTestData() {
-        // User
         testUser = new User("test@test.com", "Test User", "000000001");
         userRepository.save(testUser);
 
@@ -72,12 +72,12 @@ public abstract class BaseIntegrationTest {
         testAccount.setCard(testDebitCard);
 
         // Credit Card Account
-        Account creditAccount = new Account(testUser, "NL00TEST0000000002");
-        creditAccount.deposit(new BigDecimal("2000.00"));
-        accountRepository.save(creditAccount);
+        testCreditCardAccount = new Account(testUser, "NL00TEST0000000002");
+        testCreditCardAccount.deposit(new BigDecimal("2000.00"));
+        accountRepository.save(testCreditCardAccount);
 
-        testCreditCard = new CreditCard(creditAccount, "4000000000000002", YearMonth.of(2030, 11));
+        testCreditCard = new CreditCard(testCreditCardAccount, "4000000000000002", YearMonth.of(2030, 11));
         cardRepository.save(testCreditCard);
-        creditAccount.setCard(testCreditCard);
+        testCreditCardAccount.setCard(testCreditCard);
     }
 }

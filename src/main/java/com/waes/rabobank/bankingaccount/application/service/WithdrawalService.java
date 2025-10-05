@@ -11,8 +11,8 @@ import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountReposi
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.CardRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.TransactionRepository;
 import com.waes.rabobank.bankingaccount.shared.exception.*;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,7 +24,11 @@ public class WithdrawalService {
     private final CardRepository cardRepository;
     private final TransactionRepository transactionRepository;
 
-    public WithdrawalService(AccountRepository accountRepository, CardRepository cardRepository, TransactionRepository transactionRepository) {
+    public WithdrawalService(
+            AccountRepository accountRepository,
+            CardRepository cardRepository,
+            TransactionRepository transactionRepository
+    ) {
         this.accountRepository = accountRepository;
         this.cardRepository = cardRepository;
         this.transactionRepository = transactionRepository;
@@ -36,10 +40,12 @@ public class WithdrawalService {
         UUID accountId = UUID.fromString(request.accountId());
         UUID cardId = UUID.fromString(request.cardId());
 
-        // validate account
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
-        // Validate card
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException(cardId));
+        // Load entities
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException(accountId));
+
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException(cardId));
 
         // Workflow validations
         if (!card.getAccount().getId().equals(account.getId())) {
@@ -49,21 +55,16 @@ public class WithdrawalService {
             throw new InactiveCardException(cardId);
         }
 
-        // Calculate fee (polymorphism in action)
+        // Calculate fee
         BigDecimal fee = card.calculateFee(request.amount());
         BigDecimal totalAmount = request.amount().add(fee);
 
-        // Validate sufficient balance
-        if (account.getBalance().compareTo(totalAmount) < 0) {
-            throw new InsufficientFundsException(accountId, account.getBalance(), totalAmount);
-        }
-
-        // Deduct amount from account balance
+        // Execute withdrawal (domain validates balance)
         account.withdraw(totalAmount);
         accountRepository.save(account);
 
-        // Record transaction
-        var transaction = new Transaction(
+        // Create transaction for audit
+        Transaction transaction = new Transaction(
                 account,
                 card,
                 TransactionType.WITHDRAWAL,
@@ -74,9 +75,9 @@ public class WithdrawalService {
         transactionRepository.save(transaction);
 
         return new WithdrawalResponseDTO(
-                // TODO: validate usage of transactionId as public part of the response
+                transaction.getId().toString(),
                 account.getId().toString(),
-                account.getCard().getId().toString(),
+                card.getId().toString(),
                 request.amount(),
                 fee,
                 account.getBalance()
