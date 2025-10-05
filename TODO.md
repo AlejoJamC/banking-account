@@ -6,7 +6,10 @@
 * [DONE] One credit card or debit card is linked with one account
 * [DONE] One rest endpoint to see current available balance in all accounts 
 * [DONE] One rest endpoint to withdraw money
-* One rest endpoint to transfer money
+* [DONE] One rest endpoint to transfer money
+
+Before continue with last goal, there is an issue with multiple classes and @TestContainer
+
 * It should be able to audit transfers or withdrawals
 
 

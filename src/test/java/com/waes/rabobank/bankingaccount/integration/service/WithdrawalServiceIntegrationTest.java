@@ -27,7 +27,6 @@ public class WithdrawalServiceIntegrationTest extends BaseIntegrationTest {
     private TransactionRepository transactionRepository;
 
     @Test
-        // testing happy path
     void shouldWithdrawSuccessfully() {
         // Arrange
         WithdrawalRequestDTO request = new WithdrawalRequestDTO(
