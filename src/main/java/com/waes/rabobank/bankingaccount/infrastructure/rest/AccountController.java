@@ -26,7 +26,7 @@ public class AccountController {
         this.withdrawalService = withdrawalService;
     }
 
-    // Get All accounts balance of the current user with pagination
+    // Get All accounts balance of the authenticated user
     @GetMapping
     public List<AccountBalanceDTO> getAllAccounts(
             @RequestHeader("X-User-Id") String authenticatedUserId

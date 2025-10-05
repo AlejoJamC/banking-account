@@ -40,7 +40,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             @Param("type") TransactionType type,
             @Param("since") Instant since);
 
-    Optional<User> findByEmail(String email);
-
-    boolean existsByEmail(String email);
 }

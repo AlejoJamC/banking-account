@@ -1,6 +1,7 @@
 package com.waes.rabobank.bankingaccount.domain.model;
 
 import com.waes.rabobank.bankingaccount.domain.enums.AccountStatus;
+import com.waes.rabobank.bankingaccount.shared.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OptimisticLockType;
 import org.hibernate.annotations.OptimisticLocking;
@@ -70,7 +71,11 @@ public class Account {
             throw new IllegalArgumentException("Amount must be positive");
         }
         if (this.balance.compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient funds"); // create InsufficientFundsException
+            throw new InsufficientFundsException(
+                    this.getId(),
+                    this.balance,
+                    amount
+            );
         }
         this.balance = this.balance.subtract(amount);
     }

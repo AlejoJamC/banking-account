@@ -10,6 +10,7 @@ import com.waes.rabobank.bankingaccount.domain.model.Transaction;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.CardRepository;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.TransactionRepository;
+import com.waes.rabobank.bankingaccount.shared.exception.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -36,16 +37,16 @@ public class WithdrawalService {
         UUID cardId = UUID.fromString(request.cardId());
 
         // validate account
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found")); // create AccountNotFoundException
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
         // Validate card
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found")); // create CardNotFoundException
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException(cardId));
 
         // Workflow validations
         if (!card.getAccount().getId().equals(account.getId())) {
-            throw new RuntimeException("Card does not belong to the account"); // create CardAccountMismatchException
+            throw new CardAccountMismatchException(cardId, accountId);
         }
         if (card.getStatus() != CardStatus.ACTIVE) {
-            throw new RuntimeException("Card is not active"); // create InactiveCardException
+            throw new InactiveCardException(cardId);
         }
 
         // Calculate fee (polymorphism in action)
@@ -54,7 +55,7 @@ public class WithdrawalService {
 
         // Validate sufficient balance
         if (account.getBalance().compareTo(totalAmount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientFundsException(accountId, account.getBalance(), totalAmount);
         }
 
         // Deduct amount from account balance

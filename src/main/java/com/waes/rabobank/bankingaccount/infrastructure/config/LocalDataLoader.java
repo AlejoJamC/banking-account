@@ -105,5 +105,13 @@ public class LocalDataLoader implements CommandLineRunner {
         CreditCard janeCard1 = new CreditCard(janeAccount1, "7777000000003333", YearMonth.of(2028, 6));
         cardRepository.save(janeCard1);
         janeAccount1.setCard(janeCard1);
+
+        // User 4: Bob NoCard Brown
+        User bob = new User(
+                "bob@rabobank.nl",
+                "Bob NoCard Brown",
+                "444555666"
+        );
+        userRepository.save(bob);
     }
 }

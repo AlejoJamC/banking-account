@@ -3,6 +3,8 @@ package com.waes.rabobank.bankingaccount.application.service;
 import com.waes.rabobank.bankingaccount.application.dto.AccountBalanceDTO;
 import com.waes.rabobank.bankingaccount.domain.model.Account;
 import com.waes.rabobank.bankingaccount.infrastructure.persistence.AccountRepository;
+import com.waes.rabobank.bankingaccount.infrastructure.persistence.UserRepository;
+import com.waes.rabobank.bankingaccount.shared.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,12 +16,17 @@ import java.util.UUID;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
     public List<AccountBalanceDTO> getBalancesByUserId(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
 
         return accountRepository.findBalancesByUserId(userId)
                 .stream()
