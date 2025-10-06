@@ -27,26 +27,30 @@ Write some code in Java to simulate a simple bank account. It should be possible
 * Junit 5 & testcontainers
 
 ### Nice to have:
-* LocalStack (AWS Emulation)
 * OpenTelemetry
-
-## Design Patterns Used:
 
 ## Local Setup:
 1. Install Docker and Docker Compose
 2. Clone the repository
 3. Navigate to the project directory
 4. Run `docker-compose up --build` to start the application and PostgreSQL database
-5. The application will be accessible at `http://localhost:8080`
-6. Use Postman or any API client to interact with the REST endpoints
-7. To run tests, execute `mvn test` in the project directory 
-8. Access PostgreSQL database at `localhost:5432` with username `myuser` and password `mypassword`
+5. Access PostgreSQL database at `localhost:5432` with username `myuser` and password `mypassword`
+6. The application will be accessible at `http://localhost:8080`
+7. Use Postman or any API client to interact with the REST endpoints, Postman collection is available in the repository [banking-account-rabobank.postman_collection.json](banking-account-rabobank.postman_collection.json)
+8. To run tests, execute `mvn test` in the project directory 
+
+## Deployment & Dockerization:
+Instructions to build and run the application using Docker: [Deployment.md](Deployment.md)
 
 ## REST Endpoints:
 * `GET /api/accounts` - Get all accounts with current balance
+* `GET /api/accounts/{id}` - Get account details by ID
+* `POST /api/accounts` - Create a new account
+* `PUT /api/accounts/{id}` - Update account information
+* `DELETE /api/accounts/{id}` - Delete an account
 * `POST /api/accounts/withdraw` - Withdraw money from an account
 * `POST /api/accounts/transfer` - Transfer money between accounts
 * `GET /api/audit` - Get all audit logs for transfers and withdrawals
+* `GET /api/audit/{id}` - Get audit log details by ID
 * `GET /actuator/health` - Check application health status
-* `GET /actuator/info` - Get application info
-
+* `GET /actuator/info` - Get application inf
