@@ -51,7 +51,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFoundException(UserNotFoundException ex) {
-        logger.warn("exception.user_not_found", kv("userId", ex.getUserId()));
+        if (ex.getUserId() != null) {
+            logger.warn("exception.user_not_found", kv("userId", ex.getUserId()));
+        } else {
+            logger.warn("exception.user_not_found", kv("email", ex.getEmail()));
+        }
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
@@ -59,7 +63,12 @@ public class GlobalExceptionHandler {
         );
         problem.setTitle("User Not Found");
         problem.setType(URI.create("https://api.rabobank.com/errors/user-not-found"));
-        problem.setProperty("userId", ex.getUserId().toString());
+
+        if (ex.getUserId() != null) {
+            problem.setProperty("userId", ex.getUserId().toString());
+        } else {
+            problem.setProperty("email", ex.getEmail());
+        }
 
         return problem;
     }

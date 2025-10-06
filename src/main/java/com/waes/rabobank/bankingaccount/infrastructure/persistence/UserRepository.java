@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
+    Optional<User> findByEmailIgnoreCase(String email);
+
     @Query("""
             SELECT t 
             FROM Transaction t
@@ -39,5 +41,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             @Param("accountId") UUID accountId,
             @Param("type") TransactionType type,
             @Param("since") Instant since);
-
 }
