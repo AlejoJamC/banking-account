@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: banking-account-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bankingdb
+      - SPRING_DATASOURCE_USERNAME=bankuser
+      - SPRING_DATASOURCE_PASSWORD=bankpass
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - banking-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: banking-account-db
+    environment:
+      - POSTGRES_DB=bankingdb
+      - POSTGRES_USER=bankuser
+      - POSTGRES_PASSWORD=bankpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bankuser -d bankingdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banking-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  banking-network:
+    driver: bridge
