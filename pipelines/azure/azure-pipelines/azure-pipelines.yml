@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: banking-account-variables  # Variable group in Azure DevOps
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildAndTest
+        steps:
+          - task: Maven@3
+            inputs:
+              goals: 'clean package'
+
+          - task: Docker@2
+            inputs:
+              command: 'build'
+              dockerfile: 'docker/Dockerfile'
+              tags: '$(Build.BuildId)'
+
+  - stage: DeployDev
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - deployment: DeployToAzure
+        environment: 'dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: 'Azure-ServiceConnection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az deployment group create \
+                        --resource-group $(RESOURCE_GROUP) \
+                        --template-file pipelines/azure/bicep/main.bicep
